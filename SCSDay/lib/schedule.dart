@@ -25,10 +25,9 @@ class _ScheduleState extends State<Schedule> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: Icon(
-                        Icons.arrow_back,
+                      child: Image.asset(
+                        'assets/back.png',
                         color: Colors.white,
-                        size: 20,
                       ),
                     )),
                 Padding(

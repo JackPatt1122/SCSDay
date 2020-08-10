@@ -1,7 +1,7 @@
+import 'package:SCSDay/suggest.dart';
 import 'package:flutter/material.dart';
 import 'notifications.dart';
 import 'report.dart';
-import 'schedule.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -11,6 +11,19 @@ class Settings extends StatefulWidget {
 class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
+    Color color = Theme.of(context).canvasColor;
+
+    getColor() {
+      print(color);
+      return color;
+    }
+
+    changeIconColor() {
+      if (getColor() == Color(0xFF111111)) {
+        return Colors.white;
+      }
+    }
+
     return Scaffold(
         body: Material(
       child: SafeArea(
@@ -23,22 +36,20 @@ class _SettingsState extends State<Settings> {
                   height: double.infinity,
                 ),
                 GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                ),
+                    onTap: () => Navigator.pop(context),
+                    child: Image.asset(
+                      'assets/back.png',
+                      color: changeIconColor(),
+                    )),
                 Padding(
-                    padding: const EdgeInsets.only(left: 0.0, top: 30),
+                    padding: const EdgeInsets.only(left: 0.0, top: 40),
                     child: Text(
                       "Settings",
                       style:
                           TextStyle(fontFamily: 'Poppins-Bold', fontSize: 30),
                     )),
                 Padding(
-                    padding: EdgeInsets.only(top: 100),
+                    padding: EdgeInsets.only(top: 120),
                     child: GestureDetector(
                         onTap: () => Navigator.push(
                               context,
@@ -68,7 +79,7 @@ class _SettingsState extends State<Settings> {
                             ),
                           ],
                         ))),
-                Padding(
+                /*Padding(
                     padding: EdgeInsets.only(top: 160),
                     child: GestureDetector(
                         onTap: () => Navigator.push(
@@ -98,9 +109,40 @@ class _SettingsState extends State<Settings> {
                                   fontFamily: 'Poppins-SemiBold', fontSize: 20),
                             ),
                           ],
+                        ))), */
+                Padding(
+                    padding: EdgeInsets.only(top: 180), //220
+                    child: GestureDetector(
+                        onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Suggest(),
+                              ),
+                            ),
+                        child: Row(
+                          children: [
+                            Container(
+                                height: 40,
+                                width: 40,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFF3480eb),
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Image.asset(
+                                  'assets/edit.png',
+                                  color: Colors.white,
+                                )),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "Suggest a Feature",
+                              style: TextStyle(
+                                  fontFamily: 'Poppins-SemiBold', fontSize: 20),
+                            ),
+                          ],
                         ))),
                 Padding(
-                    padding: EdgeInsets.only(top: 220),
+                    padding: EdgeInsets.only(top: 240), //220
                     child: GestureDetector(
                         onTap: () => Navigator.push(
                               context,
@@ -131,7 +173,11 @@ class _SettingsState extends State<Settings> {
                           ],
                         ))),
                 Positioned(
-                    bottom: 20, child: Text("Created By Jack Patterson")),
+                    bottom: 0,
+                    child: Text(
+                      "Created By Jack Patterson",
+                      style: TextStyle(fontFamily: 'Poppins-Light'),
+                    )),
               ],
             ),
           ),

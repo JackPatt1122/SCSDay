@@ -25,7 +25,8 @@ class _ReportState extends State<Report> {
       // Create our mail/envelope.
       var envelope = new Envelope()
         ..recipients.add('jpattersonservices@gmail.com')
-        ..subject = 'SCSDay - ' + DateFormat.yMMMMd().format(DateTime.now())
+        ..subject =
+            'SCSDay - Issue - ' + DateFormat.yMMMMd().format(DateTime.now())
         ..text = '$_controller.text'.substring(52).replaceAll(
             '├, selection: TextSelection(baseOffset: -1, extentOffset: -1, affinity: TextAffinity.downstream, isDirectional: false), composing: TextRange(start: -1, end: -1))).text',
             '');
@@ -74,10 +75,9 @@ class _ReportState extends State<Report> {
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: Icon(
-                        Icons.arrow_back,
+                      child: Image.asset(
+                        'assets/back.png',
                         color: Colors.white,
-                        size: 20,
                       ),
                     )),
                 Padding(
@@ -85,7 +85,7 @@ class _ReportState extends State<Report> {
                     child: Row(
                       children: [
                         Image.asset(
-                          'assets/clock_bold.png',
+                          'assets/alert_bold.png',
                           color: Colors.white,
                         ),
                         SizedBox(
@@ -93,7 +93,7 @@ class _ReportState extends State<Report> {
                         ),
                         Material(
                             color: Colors.transparent,
-                            child: Text("Describe The Problem",
+                            child: Text("Report An Issue",
                                 style: TextStyle(
                                     fontFamily: 'Poppins-SemiBold',
                                     fontSize: 30,
@@ -117,6 +117,13 @@ class _ReportState extends State<Report> {
               padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: TextField(
                 decoration: InputDecoration(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Color(0xFFff483b), width: 2.0),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black, width: 2.0),
+                    ),
                     hintText: 'Issue:',
                     hintStyle: TextStyle(fontFamily: 'Poppins-SemiBold')),
                 controller: _controller,

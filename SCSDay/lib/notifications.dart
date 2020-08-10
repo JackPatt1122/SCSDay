@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:number_display/number_display.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
 
 class Notifications extends StatefulWidget {
   @override
@@ -8,23 +10,146 @@ class Notifications extends StatefulWidget {
 }
 
 class _NotificationState extends State<Notifications> {
+  Future<double> _getHourFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final _hour = prefs.getDouble('hour');
+    if (_hour == null) {
+      return 7;
+    }
+    return _hour;
+  }
+
+  Future<bool> _getperiodFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final _state = prefs.getBool('isPM');
+
+    return _state;
+  }
+
+  Future<double> _getMinuteFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final _minute = prefs.getDouble('minute');
+    if (_minute == null) {
+      return 20;
+    }
+    return _minute;
+  }
+
+  Future<bool> _getBoolFromprefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final _bool = prefs.getBool('bool');
+    if (_bool == null) {
+      return false;
+    }
+    return _bool;
+  }
+
+  Future<void> setHour(double hour) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('hour', hour);
+  }
+
+  Future<void> setMinute(double min) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('minute', min);
+  }
+
+  Future<void> setBool(bool state) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('bool', state);
+  }
+
+  Future<void> setPeriod(bool state) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isPM', state);
+  }
+
   bool _isSwitched = false;
 
-  double _sliderMin = 0;
-  double _sliderHour = 0;
-
-  String _notifyBool;
+  double _sliderMin = 7;
+  double _sliderHour = 20;
 
   Color _amColor = Colors.black;
   Color _pmColor = Colors.black;
 
   final display = createDisplay(length: 2);
 
-  double _notifyBoolOpacity = 1;
+  double _saveopacity = 0;
+
+  Future<void> _hourStartup() async {
+    double lasthour = await _getHourFromPrefs();
+
+    if (_sliderHour == null) {
+      setState(() {
+        _sliderHour = 7;
+      });
+    } else {
+      setState(() {
+        _sliderHour = lasthour;
+      });
+    }
+  }
+
+  Future<void> _minuteStartup() async {
+    double lastMinute = await _getMinuteFromPrefs();
+
+    if (_sliderMin == null) {
+      setState(() {
+        _sliderMin = 20;
+      });
+    } else {
+      setState(() {
+        _sliderMin = lastMinute;
+      });
+    }
+  }
+
+  Future<void> _boolStartup() async {
+    bool state = await _getBoolFromprefs();
+
+    setState(() {
+      _isSwitched = state;
+    });
+  }
+
+  Future<void> _periodStartup() async {
+    bool state = await _getperiodFromPrefs();
+    if (state == null) {
+      state = false;
+    }
+    (state)
+        ? setState(() {
+            _pmColor = Color(0xFF004DB2);
+            _amColor = Colors.black;
+          })
+        : setState(() {
+            _amColor = Color(0xFF004DB2);
+            _pmColor = Colors.black;
+          });
+  }
+
+  saveSequence() {
+// Here you can write your code
+
+    setState(() {
+      _saveopacity = 1;
+    });
+    Future.delayed(const Duration(milliseconds: 1500), () {
+// Here you can write your code
+
+      setState(() {
+        _saveopacity = 0;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    _hourStartup();
+    _minuteStartup();
+    _boolStartup();
+    _periodStartup();
   }
 
   @override
@@ -48,10 +173,9 @@ class _NotificationState extends State<Notifications> {
                     onTap: () {
                       Navigator.pop(context);
                     },
-                    child: Icon(
-                      Icons.arrow_back,
+                    child: Image.asset(
+                      'assets/back.png',
                       color: Colors.white,
-                      size: 20,
                     ),
                   )),
               Padding(
@@ -83,19 +207,18 @@ class _NotificationState extends State<Notifications> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                AnimatedOpacity(
-                    duration: Duration(milliseconds: 300),
-                    opacity: _notifyBoolOpacity,
-                    child: Text(
-                      "Toggle Notifications",
-                      style: TextStyle(
-                          fontFamily: 'Poppins-SemiBold', fontSize: 20),
-                    )),
+                Text(
+                  "Toggle Notifications",
+                  style:
+                      TextStyle(fontFamily: 'Poppins-SemiBold', fontSize: 20),
+                ),
                 CupertinoSwitch(
                   value: _isSwitched,
                   onChanged: (value) {
                     setState(() {
                       _isSwitched = value;
+                      setBool(value);
+                      saveSequence();
                     });
                   },
                   activeColor: Color(0xFF004DB2),
@@ -120,6 +243,8 @@ class _NotificationState extends State<Notifications> {
                 setState(() {
                   _amColor = Color(0xFF004DB2);
                   _pmColor = Colors.black;
+                  setPeriod(false);
+                  saveSequence();
                 });
               },
             ),
@@ -141,6 +266,8 @@ class _NotificationState extends State<Notifications> {
                 setState(() {
                   _pmColor = Color(0xFF004DB2);
                   _amColor = Colors.black;
+                  setPeriod(true);
+                  saveSequence();
                 });
               },
             ),
@@ -164,7 +291,7 @@ class _NotificationState extends State<Notifications> {
                   fontFamily: 'Poppins-SemiBold'),
             ),
             Text(
-              display(_sliderMin),
+              (display(_sliderMin).padLeft(2, '0')),
               style: TextStyle(
                   color: Color(0xFF004DB2),
                   fontSize: 50,
@@ -196,6 +323,8 @@ class _NotificationState extends State<Notifications> {
                     onChanged: (double value) {
                       setState(() {
                         _sliderHour = value;
+                        setHour(value);
+                        saveSequence();
                       });
                     })
               ],
@@ -224,30 +353,31 @@ class _NotificationState extends State<Notifications> {
                     onChanged: (double value) {
                       setState(() {
                         _sliderMin = value;
+                        setMinute(value);
+                        saveSequence();
                       });
                     })
               ],
             )),
-        Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
-                width: double.infinity,
-                height: 40,
-                decoration: BoxDecoration(
-                    color: Color(0xFF004DB2),
-                    borderRadius: BorderRadius.circular(10)),
-                child: Center(
-                    child: Text(
-                  "Submit",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'Poppins-SemiBold',
-                      fontSize: 20),
-                )),
-              ),
-            ))
+        Expanded(
+            child: Align(
+                alignment: FractionalOffset.bottomCenter,
+                child: Padding(
+                    padding: EdgeInsets.only(bottom: 10.0),
+                    child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: AnimatedOpacity(
+                                opacity: _saveopacity,
+                                duration: Duration(milliseconds: 200),
+                                child: Text(
+                                  "Saved",
+                                  style: TextStyle(
+                                      color: Color(0xFF004DB2),
+                                      fontFamily: 'Poppins-SemiBold',
+                                      fontSize: 20),
+                                ))))))),
       ],
     ))));
   }
